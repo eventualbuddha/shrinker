@@ -36,7 +36,7 @@ This would print:
 
 If `shrinks` does not know how to shrink the data you give it, it will return
 an iterator that yields nothing. You can teach shrinker about new types of data
-to shrink using `register`.
+to shrink using `addRule`.
 
 ### shrink(data, predicate, limit=Infinity) -> { iterations, data }
 
@@ -69,7 +69,7 @@ shrunk, the result will have `iterations` of 0.
 shrink(20, n => n > 5);
 ```
 
-### register(test, generator)
+### addRule(test, generator)
 
 Registers a generator for data for which `test` returns true. Use this to add
 shrinking support for your own data types.
