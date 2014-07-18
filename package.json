@@ -1,0 +1,28 @@
+{
+  "name": "shrinker",
+  "version": "0.0.0",
+  "description": "Shrinks data with an optional predicate.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha -R spec test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eventualbuddha/shrinker.git"
+  },
+  "keywords": [
+    "test",
+    "testing",
+    "shrink",
+    "quickcheck"
+  ],
+  "author": "Brian Donovan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eventualbuddha/shrinker/issues"
+  },
+  "homepage": "https://github.com/eventualbuddha/shrinker"
+}
