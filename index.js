@@ -70,8 +70,30 @@ Shrinker.prototype.addDefaultRules = function() {
  * @return {*}
  */
 Shrinker.prototype.shrink = function(data, predicate, limit) {
-  // TODO: Implement me.
   if (typeof limit === 'undefined') { limit = Infinity; }
+
+  var next;
+  var last = data;
+  var iterations;
+
+  for (iterations = 0; iterations < limit; iterations++) {
+    var shrinks = this.shrinks(last);
+    var shrunk = false;
+
+    while (!(next = shrinks.next()).done) {
+      if (predicate(next.value)) {
+        last = next.value;
+        shrunk = true;
+        break;
+      }
+    }
+
+    if (!shrunk) {
+      break;
+    }
+  }
+
+  return { iterations: iterations, data: last };
 };
 
 /**

@@ -80,6 +80,48 @@ describe('shrinks', function() {
   });
 });
 
+describe('shrink', function() {
+  context('with an integer and an always-truthy predicate', function() {
+    it('shrinks to 0', function() {
+      assert.deepEqual(
+        shrink(5, function() { return true; }),
+        { iterations: 1, data: 0 }
+      );
+      assert.deepEqual(
+        shrink(-5, function() { return true; }),
+        { iterations: 2, data: 0 }
+      );
+    });
+  });
+
+  context('with an integer and a restrictive predicate', function() {
+    it('shrinks to the smallest data that matches the predicate', function() {
+      assert.deepEqual(
+        shrink(20, function(n) {  return n > 5; }),
+        { iterations: 3, data: 6 }
+      );
+    });
+  });
+
+  context('limited to 0 iterations', function() {
+    it('returns the original data', function() {
+      assert.deepEqual(
+        shrink(99, function(){}),
+        { iterations: 0, data: 99 }
+      );
+    });
+  });
+
+  context('limited to fewer iterations than it would shrink to', function() {
+    it('returns the intermediate data', function() {
+      assert.deepEqual(
+        shrink(20, function(n) {  return n > 5; }, 2),
+        { iterations: 2, data: 8 }
+      );
+    });
+  });
+});
+
 /**
  * Asserts that the shrinks for value are the given list.
  *
