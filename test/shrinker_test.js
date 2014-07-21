@@ -120,6 +120,86 @@ describe('shrink', function() {
       );
     });
   });
+
+  context('with an array of unshrinkable elements', function() {
+    context('and an always-truthy predicate', function() {
+      it('returns an empty array after one iteration', function() {
+        assert.deepEqual(
+          shrink([atom('a'), atom('b')], function() { return true; }),
+          { iterations: 1, data: [] }
+        );
+      });
+    });
+
+    context('and a predicate that ensures the data has an "a" atom', function() {
+      it('returns an array with only the "a" atom', function() {
+        var a = atom('a');
+        var b = atom('b');
+        var c = atom('c');
+        var d = atom('d');
+        var e = atom('e');
+        assert.deepEqual(
+          shrink(
+            [c, b, a, d, e],
+            function(data) {
+              return data.some(function(element) {
+                return element.toString() === 'a';
+              });
+            }
+          ),
+          { iterations: 3, data: [a] }
+        );
+      });
+    });
+  });
+
+  context('with an array of shrinkable elements', function() {
+    it('returns a shrunk array with the smallest elements that match', function() {
+      assert.deepEqual(
+        shrink(
+          [-3, 8, 4, 99, 18, 0, 78, -5, 66],
+          function(data) {
+            return workingSum(data) !== brokenSum(data);
+          }
+        ),
+        // [0, 1] is the smallest array that illustrates the bug in brokenSum.
+        { iterations: 10, data: [0, 1] }
+      );
+
+      /**
+       * Returns the sum of all the values in the given list. This is the
+       * reference implementation against which brokenSum will be compared.
+       *
+       * @param {number[]} list
+       * @return number
+       */
+      function workingSum(list) {
+        return list.reduce(function(s, n) {
+          return s + n;
+        }, 0);
+      }
+
+      /**
+       * Returns the sum of all the values in the given list, but does not work
+       * with all lists that contain a 0. This implementation has a (contrived)
+       * bug that stops iteration of the list when it encounters a 0.
+       *
+       * @param {number[]} list
+       * @return number
+       */
+      function brokenSum(list) {
+        var sum = 0;
+
+        for (var i = 0, length = list.length; i < length; i++) {
+          var n = list[i];
+          if (n === 0) { break; } // BUG!
+          sum += n;
+        }
+
+        return sum;
+      }
+    });
+  });
 });
 
 /**
@@ -157,7 +237,7 @@ function consume(iterator) {
  */
 function atom(name) {
   var result = function() {};
-  result.toString = function() {
+  result.inspect = result.toString = function() {
     return name;
   };
   return result;
