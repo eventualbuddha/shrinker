@@ -82,6 +82,58 @@ shrink(0.1, n => n > 0);
 Registers a generator for data for which `test` returns true. Use this to add
 shrinking support for your own data types.
 
+```js
+class Complex {
+  constructor(r, i) {
+    this.r = r;
+    this.i = i;
+  }
+
+  distance(to) {
+    return Math.sqrt(Math.pow(this.r - to.r, 2), Math.pow(this.i - to.i, 2));
+  }
+
+  static get ORIGIN() {
+    return new this(0, 0);
+  }
+}
+
+addRule(
+  /**
+   * Only use this rule to process instances of `Complex`.
+   */
+  function(value) {
+    return value instanceof Complex;
+  },
+
+  /**
+   * NOTE: This example is a generator function and will only work with node's
+   * `--harmony_generators` flag enabled. If you cannot use harmony generators,
+   * consider using esnext to transpile your code to ES5.
+   *
+   * You may also simply write a regular function that returns an iterator.
+   */
+  function *(value, shrinker) {
+    var next;
+    var rIter = shrinker.shrinks(value.r);
+    var iIter = shrinker.shrinks(value.i);
+
+    // Try to shrink along the real axis first.
+    while (!(next = rIter.next()).done) {
+      yield new Complex(next.value, value.i);
+    }
+
+    // Then try shrinking along the imaginary axis.
+    while (!(next = iIter.next()).done) {
+      yield new Complex(value.r, next.value);
+    }
+  }
+);
+
+shrink(new Complex(2, 3), c => c.distance(Complex.ORIGIN) >= 1);
+// { iterations: 2, data: { r: 1, i: 0 } }
+```
+
 ### Shrinker
 
 This is the class used to create different shrinking configurations (i.e. sets
