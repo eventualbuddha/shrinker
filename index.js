@@ -1,4 +1,10 @@
-/* jshint node: true, esnext: true, undef: true, unused: true */
+/* jshint node: true, esnext: true */
+
+/** @typedef {{done: boolean, value: *}} */
+var IteratorResult;
+
+/** @typedef {{next: function(): IteratorResult}} */
+var Iterator;
 
 /**
  * @type {Iterator}
