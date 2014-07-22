@@ -62,13 +62,13 @@ describe('shrinks', function() {
       eq(
         [[], [a, 8]],
         [
-          [],           // sublist, remove 2
-          [[a, 8]],     // sublist, remove 1 (step 1)
-          [[]],         // sublist, remove 1 (step 2)
+          [],           // sub-list, remove 2
+          [[a, 8]],     // sub-list, remove 1 (step 1)
+          [[]],         // sub-list, remove 1 (step 2)
           // no shrinks for element 0 ([]), skipping
-          [[], []],     // shrink [a, 8], sublist, remove 2
-          [[], [8]],    // shrink [a, 8], sublist, remove 1 (step 1)
-          [[], [a]],    // shrink [a, 8], sublist, remove 1 (step 2)
+          [[], []],     // shrink [a, 8], sub-list, remove 2
+          [[], [8]],    // shrink [a, 8], sub-list, remove 1 (step 1)
+          [[], [a]],    // shrink [a, 8], sub-list, remove 1 (step 2)
           // shrink [a, 8], no shrinks for element 0 (a), skipping
           [[], [a, 0]], // shrink [a, 8], shrink 8 (step 1)
           [[], [a, 4]], // shrink [a, 8], shrink 8 (step 2)
@@ -121,7 +121,7 @@ describe('shrink', function() {
     });
   });
 
-  context('with an array of unshrinkable elements', function() {
+  context('with an array of un-shrinkable elements', function() {
     context('and an always-truthy predicate', function() {
       it('returns an empty array after one iteration', function() {
         assert.deepEqual(
@@ -171,10 +171,10 @@ describe('shrink', function() {
        * reference implementation against which brokenSum will be compared.
        *
        * @param {number[]} list
-       * @return number
+       * @return {number}
        */
       function workingSum(list) {
-        return list.reduce(function(s, n) {
+        return /** @type number */list.reduce(function(s, n) {
           return s + n;
         }, 0);
       }
@@ -213,8 +213,8 @@ describe('shrink', function() {
   context('with a string and a length-restricted predicate', function() {
     it('returns the shortest matching string', function() {
       assert.deepEqual(
-        shrink('abcdefghijklmnop', function(s) { return s.length > 2; }),
-        { iterations: 3, data: 'nop' }
+        shrink('some stuff is too long', function(s) { return s.length > 2; }),
+        { iterations: 3, data: 'ong' }
       );
     });
   });
@@ -233,7 +233,7 @@ describe('shrink', function() {
  * Asserts that the shrinks for value are the given list.
  *
  * @param {*} value
- * @param {*[]}
+ * @param {*[]} list
  */
 function eq(value, list) {
   assert.deepEqual(consume(shrinks(value)), list);
