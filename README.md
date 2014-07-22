@@ -73,3 +73,17 @@ shrink(20, n => n > 5);
 
 Registers a generator for data for which `test` returns true. Use this to add
 shrinking support for your own data types.
+
+### Shrinker
+
+This is the class used to create different shrinking configurations (i.e. sets
+of rules). There is a default shrinker which the other export functions -
+`shrinks`, `shrink`, and `addRule` - delegate to. By default instances of
+`Shrinker` have no shrinking rules, but you can call `addDefaultRules` to add
+all the built-in rules you have with the default shrinker.
+
+```js
+var shrinker = new Shrinker();
+shrinker.addDefaultRules();
+shrinker.shrink(20, n => n > 5);
+```
