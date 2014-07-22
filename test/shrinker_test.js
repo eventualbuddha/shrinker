@@ -200,6 +200,33 @@ describe('shrink', function() {
       }
     });
   });
+
+  context('with a string and an always-truthy predicate', function() {
+    it('returns the empty string', function() {
+      assert.deepEqual(
+        shrink('food', function() { return true; }),
+        { iterations: 1, data: '' }
+      );
+    });
+  });
+
+  context('with a string and a length-restricted predicate', function() {
+    it('returns the shortest matching string', function() {
+      assert.deepEqual(
+        shrink('abcdefghijklmnop', function(s) { return s.length > 2; }),
+        { iterations: 3, data: 'nop' }
+      );
+    });
+  });
+
+  context('with a string and a content-restricted predicate', function() {
+    it('shrinks the string content until it matches', function() {
+      assert.deepEqual(
+        shrink('property', function(s) { return s.charCodeAt(0) > 108; }),
+        { iterations: 3, data: 'y' }
+      );
+    });
+  });
 });
 
 /**

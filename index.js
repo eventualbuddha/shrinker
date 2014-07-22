@@ -164,6 +164,31 @@ exports.RULES = {
         }
       }
     }
+  ),
+
+  string: new Rule(
+    function(value) {
+      return typeof value === 'string';
+    },
+
+    function *(value) {
+      // Empty strings cannot be shrunk.
+      if (value.length === 0) { return; }
+
+      // Start with an empty string.
+      yield '';
+
+      var toRemove = Math.floor(value.length / 2);
+
+      // Loop through all the possible lengths.
+      while (toRemove > 0) {
+        // Yield slices of the original.
+        for (var offset = 0; offset + toRemove <= value.length; offset++) {
+          yield value.slice(0, offset).concat(value.slice(offset + toRemove));
+        }
+        toRemove = Math.floor(toRemove / 2);
+      }
+    }
   )
 };
 
