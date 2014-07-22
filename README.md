@@ -87,3 +87,11 @@ var shrinker = new Shrinker();
 shrinker.addDefaultRules();
 shrinker.shrink(20, n => n > 5);
 ```
+
+### Contributing
+
+1. Fork this repository.
+1. Create a branch for your feature/bug fix.
+1. Create as many commits as makes sense for your change, ignoring changes to lib/index.es5.js.
+1. Add tests for all your changes.
+1. Push your changes to your remote and open a pull request.
