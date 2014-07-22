@@ -1,6 +1,6 @@
 {
   "name": "shrinker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Shrinks data with an optional predicate.",
   "main": "index.js",
   "directories": {
