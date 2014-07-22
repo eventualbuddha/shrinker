@@ -3,7 +3,7 @@ var shrink = require('..').shrink;
 var shrinks = require('..').shrinks;
 
 describe('shrinks', function() {
-  describe('integers', function() {
+  context('integers', function() {
     it('has nothing for 0', function() {
       eq(0, []);
     });
@@ -29,7 +29,7 @@ describe('shrinks', function() {
     });
   });
 
-  describe('arrays', function() {
+  context('arrays', function() {
     it('has nothing for empty arrays', function() {
       eq([], []);
     });
@@ -76,6 +76,34 @@ describe('shrinks', function() {
           [[], [a, 7]]  // shrink [a, 8], shrink 8 (step 4)
         ]
       );
+    });
+  });
+
+  context('strings', function() {
+    it('has nothing for empty strings', function() {
+      eq('', []);
+    });
+
+    it('shrinks strings of length 1 to the empty string', function() {
+      eq('a', ['']);
+    });
+
+    it('shrinks string lengths but does not shrink string characters', function() {
+      eq('abc', ['', 'bc', 'ac', 'ab']);
+    });
+  });
+
+  context('dates', function() {
+    it('has nothing for a date at the start of the epoch', function() {
+      eq(new Date(0), []);
+    });
+
+    it('shrinks dates after the epoch by shrinking the milliseconds as a number', function() {
+      eq(new Date(20), [new Date(0), new Date(10), new Date(15), new Date(18), new Date(19)]);
+    });
+
+    it('shrinks dates before the epoch by shrinking the milliseconds as a number', function() {
+      eq(new Date(-10), [new Date(10), new Date(0), new Date(-5), new Date(-8), new Date(-9)]);
     });
   });
 });
@@ -225,6 +253,26 @@ describe('shrink', function() {
         shrink('property', function(s) { return s.charCodeAt(0) > 108; }),
         { iterations: 3, data: 'y' }
       );
+    });
+  });
+
+  context('with a Date and an always-truthy predicate', function() {
+    it('returns the start of the epoch', function() {
+      assert.deepEqual(
+        shrink(new Date(), function() { return true; }),
+        { iterations: 1, data: new Date(0) }
+      );
+    });
+  });
+
+  context('with a Date and a predicate that only matches Tuesdays (UTC)', function() {
+    it('returns midnight UTC on a Tuesday', function() {
+      var result = shrink(new Date(), function(d) { return d.getUTCDay() === 2; });
+      assert.equal(result.data.getUTCDay(), 2);
+
+      // The number of iterations are difficult to reason about here, so we just
+      // ensure that *something* happened, though we don't specify what exactly.
+      assert.ok(result.iterations > 0, 'has more than zero iterations');
     });
   });
 });

@@ -195,6 +195,23 @@ exports.RULES = {
         toRemove = Math.floor(toRemove / 2);
       }
     }
+  ),
+
+  date: new Rule(
+    function(value) {
+      return value instanceof Date;
+    },
+
+    function *(value, shrinker) {
+      // Dates already at the epoch cannot be shrunk.
+      if (value.valueOf() === 0) { return; }
+
+      var millisecondsIterator = shrinker.shrinks(value.valueOf());
+      var next;
+      while (!(next = millisecondsIterator.next()).done) {
+        yield new Date(next.value);
+      }
+    }
   )
 };
 
