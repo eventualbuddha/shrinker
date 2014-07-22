@@ -42,8 +42,8 @@ Shrinker.prototype.addRule = function(test, generate) {
 Shrinker.prototype.shrinks = function(data) {
   for (var i = 0, length = this.rules.length; i < length; i++) {
     var rule = this.rules[i];
-    if (rule.test(data)) {
-      return rule.generate(data);
+    if (rule.test(data, this)) {
+      return rule.generate(data, this);
     }
   }
 
@@ -99,8 +99,8 @@ Shrinker.prototype.shrink = function(data, predicate, limit) {
 /**
  * Struct containing the test and generate functions for a shrink rule.
  *
- * @param {function(*): boolean} test
- * @param {function(*): Iterator} generate
+ * @param {function(*, Shrinker): boolean} test
+ * @param {function(*, Shrinker): Iterator} generate
  * @constructor
  */
 function Rule(test, generate) {
@@ -114,10 +114,10 @@ exports.RULES = {
       return typeof value === 'number' && parseInt(value) === value;
     },
 
-    function *(value) {
+    function *(value, shrinker) {
       if (value < 0) {
         yield -value;
-        var positives = DEFAULT_SHRINKER.shrinks(-value);
+        var positives = shrinker.shrinks(-value);
         var next;
         while (!(next = positives.next()).done) {
           yield -next.value;
@@ -135,7 +135,7 @@ exports.RULES = {
   array: new Rule(
     Array.isArray,
 
-    function *(value) {
+    function *(value, shrinker) {
       // Empty arrays cannot be shrunk.
       if (value.length === 0) { return; }
 
@@ -157,7 +157,7 @@ exports.RULES = {
       for (var i = 0; i < value.length; i++) {
         var next;
         var entry = value[i];
-        var smaller = DEFAULT_SHRINKER.shrinks(entry);
+        var smaller = shrinker.shrinks(entry);
 
         while (!(next = smaller.next()).done) {
           yield value.slice(0, i).concat([next.value], value.slice(i + 1));
