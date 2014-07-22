@@ -29,6 +29,43 @@ describe('shrinks', function() {
     });
   });
 
+  context('floats', function() {
+    function checkFloat(original) {
+      var floats = consume(shrinks(original));
+      var zeroIndex = original < 0 ? 1 : 0;
+
+      assert.equal(
+        floats[zeroIndex],
+        0,
+        'the float at ' + zeroIndex + ' should be zero (was ' + floats[zeroIndex] + ')'
+      );
+
+      assert.ok(
+        floats.length > 10,
+        'there should be quite a few floats'
+      );
+
+      for (var i = 2; i < floats.length; i++) {
+        assert.ok(
+          Math.abs(original - floats[i - 1]) > Math.abs(original - floats[i]),
+          'float at ' + i + ' (' + floats[i] + ') should be closer to the ' +
+          'original value than the one before it (' + floats[i - 1] + ')'
+        );
+
+        assert.ok(
+          Math.abs(floats[i]) < Math.abs(original),
+          'float at ' + i + ' (' + floats[i] + ') should be less ' +
+          'than the original value (' + original + ')'
+        );
+      }
+    }
+
+    it('always returns a number closer to the original than the last', function() {
+      checkFloat(Math.PI);
+      checkFloat(-Math.PI);
+    });
+  });
+
   context('arrays', function() {
     it('has nothing for empty arrays', function() {
       eq([], []);
@@ -127,6 +164,33 @@ describe('shrink', function() {
       assert.deepEqual(
         shrink(20, function(n) {  return n > 5; }),
         { iterations: 3, data: 6 }
+      );
+    });
+  });
+
+  context('with a float and a restrictive predicate', function() {
+    it('returns a smaller value than the original but still matching the predicate', function() {
+      var result = shrink(Math.PI, function(n) { return n > Math.SQRT2; });
+
+      assert.ok(
+        result.iterations > 0,
+        'there should be at least one iteration'
+      );
+
+      assert.ok(
+        result.data < Math.PI,
+        'result data should be smaller than the original'
+      );
+
+      assert.ok(
+        result.data > Math.SQRT2,
+        'result data should match the predicate'
+      );
+
+      var nextFloat = Math.SQRT2 - (result.data - Math.SQRT2) / 2;
+      assert.ok(
+        nextFloat <= Math.SQRT2,
+        'result data cannot get any closer to the predicate'
       );
     });
   });

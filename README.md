@@ -69,6 +69,14 @@ shrunk, the result will have `iterations` of 0.
 shrink(20, n => n > 5);
 ```
 
+Here's an example of using `shrink` to find the smallest representable floating
+point number in JavaScript:
+
+```js
+shrink(0.1, n => n > 0);
+// { iterations: 1070, data: 5e-324 }
+```
+
 ### addRule(test, generator)
 
 Registers a generator for data for which `test` returns true. Use this to add
