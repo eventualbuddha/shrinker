@@ -1,5 +1,7 @@
 # shrinker
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/eventualbuddha/shrinker.svg)](https://greenkeeper.io/)
+
 Shrinker shrinks data. There might be a lot of reasons to do this, but the one
 shrinker was designed for is shrinking randomly-generated test data.
 
